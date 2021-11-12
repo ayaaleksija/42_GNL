@@ -5,12 +5,26 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: agondard <agondard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/03 14:33:19 by agondard          #+#    #+#             */
-/*   Updated: 2021/11/09 19:03:36 by agondard         ###   ########.fr       */
+/*   Created: 2021/11/11 18:07:23 by agondard          #+#    #+#             */
+/*   Updated: 2021/11/12 14:05:16 by agondard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+int		there_is_n(char *str)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\n')
+			return (1);
+		i++;
+	}
+	return (0);
+}
 
 int		lenn(char *str)
 {
@@ -19,15 +33,13 @@ int		lenn(char *str)
 	i = 0;
 	while (str[i] && str[i] != '\n')
 		i++;
-	if (str[i] == '\n')
-		++i;
 	return (i);
 }
 
 char	*ft_strdup(char *src)
 {
 	char	*cpy;
-	int		size;
+	size_t	size;
 
 	size = lenn(src);
 	cpy = (char *)malloc(sizeof (char) * (size + 1));
@@ -39,17 +51,17 @@ char	*ft_strdup(char *src)
 		cpy[size] = src[size];
 		size++;
 	}
-	cpy[size] = '\0';
+	cpy[size] = 0;
 	return (cpy);
 }
 
-char	*rspecial_function(char *line, char *buffer)
+char	*strjoin(char *line, char *buffer)
 {
 	int		i;
 	int 	j;
 	char	*ret;
 
-	if (buffer == NULL)
+	if (!buffer)
 		return (NULL);
 	i = lenn(buffer) + lenn(line);
 	ret = malloc(sizeof(char) * (i + 1));
@@ -58,35 +70,12 @@ char	*rspecial_function(char *line, char *buffer)
 	j = -1;
 	while (line[++j])
 		ret[j] = line[j];
-	free(line);
 	i = 0;
 	while (buffer[i] != '\n' && buffer[i])
 		ret[j++] = buffer[i++];
 	if (buffer[i] == '\n')
-		ret[i++] = '\n';
-	ret[i] = '\0';
+		ret[j++] = '\n';
+	ret[j] = '\0';
+	free(line);
 	return (ret);
-}
-
-char	*clean_buffer(char *buffer, char *line)
-{
-	int		i;
-	int		j;
-
-	i = 0;
-	j = lenn(buffer);
-	if (buffer[j] == '\n')
-		++j;
-	while (buffer[i])
-	{
-		buffer[i] = buffer[j];
-		++i;
-		++j;
-	}
-	while (buffer[i])
-	{
-		buffer[i] = 0;
-		++i;
-	}
-	return (line);
 }

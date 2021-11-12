@@ -5,63 +5,70 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: agondard <agondard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/03 14:27:05 by agondard          #+#    #+#             */
-/*   Updated: 2021/11/09 17:59:13 by agondard         ###   ########.fr       */
+/*   Created: 2021/11/11 18:04:32 by agondard          #+#    #+#             */
+/*   Updated: 2021/11/12 14:05:46 by agondard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int		there_is_n(char *c)
+char	*clean_buffer(char *buffer, char *line)
 {
-	int i;
+	int		i;
+	int		j;
 
-	i = -1;
-	while (c[++i])
+	i = 0;
+	j = lenn(buffer);
+	if (buffer[j] == '\n')
+		++j;
+	while (buffer[i])
 	{
-		if (c[i] == '\n')
-			return (1);
+		buffer[i] = buffer[j];
+		++i;
+		++j;
 	}
-	return (0);
+	while (buffer[i])
+	{
+		buffer[i] = 0;
+		++i;
+	}
+	return (line);
+}
+
+char	*free_line(char *line)
+{
+	if (!line)
+		return (NULL);
+	free (line);
+	line = NULL;
+	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	buffer[BUFFER_SIZE + 1];
 	char		*ret;
 	int			b;
+	static char	buffer[BUFFER_SIZE + 1];
 
+	if (BUFFER_SIZE <= 0 || read(fd, buffer, 0) == -1)
+		return (NULL);
 	ret = ft_strdup("");
-	ret = rspecial_function(ret, buffer);
-	while (!there_is_n(buffer))
+	ret = strjoin(ret, buffer);
+	b = 1;
+	while (b > 0 && !there_is_n(buffer))
 	{
 		b = read(fd, buffer, BUFFER_SIZE);
-
 		if (b == -1)
-			return (NULL);
-		else if (b == 0)
+			return (free_line(ret));
+		else if (b)
 		{
-			return (NULL);
+			buffer[b] = '\0';
+			ret = strjoin(ret, buffer);
 		}
-		ret = rspecial_function(ret, buffer);
+		else if (b == 0 && buffer[0] != 0)
+			return (clean_buffer(buffer, ret));
+		else
+			return (free_line(ret));
 	}
-	return (ret);
-}
-
-int	main(void)
-{
-	char	*txt;
-	int		fd;
-
-	fd = open("tamere.txt", O_RDONLY);
-	while(fd)
-	{
-		txt = get_next_line(fd);
-		printf("%s", txt);
-		if (txt == NULL)
-			break;
-		free(txt);
-	}
-	close(fd);
-	return (0);
+	return (clean_buffer(buffer, ret));
 }
