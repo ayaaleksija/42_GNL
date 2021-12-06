@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agondard <agondard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 18:04:32 by agondard          #+#    #+#             */
-/*   Updated: 2021/12/06 18:55:23 by agondard         ###   ########.fr       */
+/*   Updated: 2021/12/06 21:54:39 by agondard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,27 +48,27 @@ char	*get_next_line(int fd)
 {
 	char		*ret;
 	int			b;
-	static char	buffer[BUFFER_SIZE + 1];
+	static char	buffer[1024][BUFFER_SIZE + 1];
 
-	if (BUFFER_SIZE <= 0 || read(fd, buffer, 0) == -1)
+	if (BUFFER_SIZE <= 0 || read(fd, buffer[fd], 0) == -1)
 		return (NULL);
 	ret = ft_strdup("");
-	ret = strjoin(ret, buffer);
+	ret = strjoin(ret, buffer[fd]);
 	b = 1;
-	while (b > 0 && !there_is_n(buffer))
+	while (b > 0 && !there_is_n(buffer[fd]))
 	{
-		b = read(fd, buffer, BUFFER_SIZE);
+		b = read(fd, buffer[fd], BUFFER_SIZE);
 		if (b == -1)
 			return (free_line(ret));
 		else if (b)
 		{
-			buffer[b] = '\0';
-			ret = strjoin(ret, buffer);
+			buffer[fd][b] = '\0';
+			ret = strjoin(ret, buffer[fd]);
 		}
-		else if (b == 0 && buffer[0] != 0)
-			return (clean_buffer(buffer, ret));
+		else if (b == 0 && buffer[fd][0] != 0)
+			return (clean_buffer(buffer[fd], ret));
 		else
 			return (free_line(ret));
 	}
-	return (clean_buffer(buffer, ret));
+	return (clean_buffer(buffer[fd], ret));
 }
